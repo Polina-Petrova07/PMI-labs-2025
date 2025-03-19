@@ -15,6 +15,7 @@ ln1p_start=-0.9
 ln1p_end=1
 ln1p_step=0.1
 
+./taylor # Print header
 for terms in 4 32; do
     run $trig_start $trig_end $trig_step sin  $terms
     run $trig_start $trig_end $trig_step cos  $terms
