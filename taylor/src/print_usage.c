@@ -14,7 +14,7 @@ int print_usage(FILE * file) {
     tryputs("\nsupported series names:\n");
     for (const series * restrict ser = series_plural; ser < series_plural_end; ser++)
         tryprintf("%8s - %s\n", ser->nam, ser->desc);
-    tryputs("\ntable header:\n");
+    tryputs("\ntable header [to standard output]\n");
     print_header();
     return 0;
 }
