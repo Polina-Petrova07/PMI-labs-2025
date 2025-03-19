@@ -8,7 +8,7 @@ int print_header(void) {
     try(fputs("Series name,x,Number of terms,libm value,", stdout));
     const char * algdesc = sum_algs[0].desc;
     try(printf("%s sum,%s abs. error", algdesc, algdesc));
-    for (const sum_alg *restrict al = sum_algs; al < sum_algs_end; al++) {
+    for (const sum_alg *restrict al = sum_algs + 1; al < sum_algs_end; al++) {
         try(printf(",%s sum,%s error rel. to first", al->desc, al->desc));
     }
     try(putchar('\n'));
