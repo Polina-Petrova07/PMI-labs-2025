@@ -19,3 +19,4 @@ extern const size_t num_sum_algs;
 #define sum_algs_end (sum_algs + num_sum_algs)
 
 unsigned short str2idx_sum_alg(const char * str);
+double calc_sum(const double4 *restrict terms, unsigned num_terms, const sum_alg *restrict sumfn);

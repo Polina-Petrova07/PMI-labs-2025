@@ -1,4 +1,5 @@
 #include "sumfn.h"
+#include "util.h"
 #include <limits.h>
 #include <string.h>
 
@@ -26,4 +27,8 @@ unsigned short str2idx_sum_alg(const char * str) {
     for (unsigned short i = 0; i < num_sum_algs; i++)
         if (strcmp(str, sum_algs[i].nam) == 0) return i;
     return USHRT_MAX;
+}
+
+double calc_sum(const double4 *restrict terms, unsigned num_terms, const sum_alg *restrict sumfn) {
+    return sumfn->pfn(terms, align_to_lane(num_terms) / LANE_WIDTH);
 }

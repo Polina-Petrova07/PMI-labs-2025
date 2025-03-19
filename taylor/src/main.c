@@ -4,64 +4,29 @@
 #include "sumfn.h"
 #include "util.h"
 
-#include <assert.h>
 #include <errno.h>
-#include <limits.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_TERMS_ALIGN 4
+static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns num_terms) {
+    tryprintf("%s" CS PRECDBL CS "%u", ser->nam, x, num_terms);
 
-typedef double         dbl  ;
-typedef unsigned short shuns;
-typedef unsigned       uns  ;
-typedef unsigned long  lguns;
-#define cdbl   const dbl
-#define cshuns const shuns
-#define cuns   const uns
-#define clguns const lguns
-#define exc restrict
-
-#define ALLOCA_CUTOFF_TERMS 512
-
-#define PREC "18"
-
-#define CS "\037"
-#define RS "\036"
-#define PRECDBL "%#."PREC"lf"
-
-static uns align_to_lane(cuns num_terms) {
-    return (num_terms + (NUM_TERMS_ALIGN - 1)) & ~(NUM_TERMS_ALIGN - 1);
-}
-
-static int do_row(
-    dbl x,
-    const double4 *exc terms,
-    cuns num_terms,
-    const series * ser,
-    const sum_alg *exc sumfn
-) {
-    cdbl sum = sumfn->pfn(terms, align_to_lane(num_terms) / NUM_TERMS_ALIGN);
     cdbl ref = ser->ref(x);
-    cdbl abserr = sum - ref;
-    #define ROW_F "%s" CS PRECDBL CS "%u" CS "%s" CS PRECDBL CS PRECDBL RS
-    if (printf(ROW_F, ser->nam, x, num_terms, sumfn->nam, sum, abserr) == -1)
-        return -1;
-    return 0;
-}
+    const sum_alg *exc al = sum_algs;
+    cdbl first_sum     = calc_sum(terms, num_terms, al);
+    cdbl first_abs_err = first_sum - ref;
+    tryprintf(CS PRECDBL CS PRECDBL CS PRECDBL, ref, first_sum, first_abs_err);
 
-static void fill_terms(dbl x, const series *exc ser, double4 *exc terms, cuns num_terms) {
-    cuns num_terms_align = align_to_lane(num_terms);
-    ser->gen(x, (dbl *) terms, num_terms);
-    for (size_t i = num_terms; i < num_terms_align; i++) ((dbl *) terms)[i] = 0.0;
-#ifdef DEBUG_SERIES
-        for (cdbl *exc d = (cdbl *) terms; d < (cdbl *) terms + num_terms_align; d++)
-            fprintf(stderr, "%p " PRECDBL "\n", d, *d);
-        putchar('\n');
-#endif
+    for (al++; al < sum_algs_end; al++) {
+        cdbl sum     = calc_sum(terms, num_terms, al);
+        cdbl rel_err = fabs((sum - ref) / first_abs_err);
+        tryprintf(CS PRECDBL CS PRECDBL, sum, rel_err);
+    }
+
+    try(putchar(*RS));
+    return 0;
 }
 
 static int main_inner(cdbl xstart, cdbl xend, cdbl xstep, const series *exc ser, cuns num_terms) {
@@ -74,10 +39,12 @@ static int main_inner(cdbl xstart, cdbl xend, cdbl xstep, const series *exc ser,
     dbl x = xstart;
     do {
         fill_terms(x, ser, terms, num_terms);
-
-        for (const sum_alg *exc al = sum_algs; al < sum_algs_end; al++)
-            if (do_row(x, (const double4 *) terms, num_terms, ser, al) == -1) return -1;
-
+#ifdef DEBUG_SERIES
+        for (cdbl *exc d = (cdbl *) terms; d < (cdbl *) terms + num_terms_align; d++)
+            fprintf(stderr, "%p " PRECDBL "\n", d, *d);
+        putchar('\n');
+#endif
+        for_x(x, ser, terms, num_terms);
         x += xstep;
     } while ((xstep > 0 && x < xend) || (xstep < 0 && x > xend));
     return 0;
@@ -117,7 +84,7 @@ int main(int argc, char ** argv) {
     if (!str_to_ulong(num_terms_tx, &num_terms, &serr))
         bail("failed to determine requested number of terms: %s", serr);
 
-    if (num_terms > UINT_MAX - (NUM_TERMS_ALIGN - 1))
+    if (num_terms > UINT_MAX - (LANE_WIDTH - 1))
         bail("%lu terms is entirely too many terms", num_terms);
 
     if (main_inner(xstart, xend, xstep, &series_plural[ser_idx], num_terms) < 0 && errno != 0) {
@@ -128,6 +95,3 @@ int main(int argc, char ** argv) {
     };
     return 0;
 }
-
-static_assert(0 < NUM_TERMS_ALIGN && NUM_TERMS_ALIGN <= UINT_MAX, "invalid alignment");
-static_assert(SIZE_MAX / sizeof(double4) > ALLOCA_CUTOFF_TERMS, "invalid alloca() cutoff");

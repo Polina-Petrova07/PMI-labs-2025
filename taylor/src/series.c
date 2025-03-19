@@ -1,4 +1,5 @@
 #include "series.h"
+#include "util.h"
 #include <limits.h>
 #include <math.h>
 #include <string.h>
@@ -60,4 +61,11 @@ unsigned short str2idx_series(const char * str) {
     for (unsigned short i = 0; i < num_series; i++)
         if (strcmp(str, series_plural[i].nam) == 0) return i;
     return USHRT_MAX;
+}
+
+void fill_terms(double x, const series *restrict ser, double4 *restrict terms, unsigned num_terms) {
+    double *restrict d_terms = (double *) terms;
+    unsigned num_terms_align = align_to_lane(num_terms);
+    ser->gen(x, d_terms, num_terms);
+    memset(&d_terms[num_terms], 0, (num_terms_align - num_terms) * sizeof(double));
 }

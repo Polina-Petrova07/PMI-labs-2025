@@ -1,5 +1,7 @@
 #pragma once
 
+#include "double4.h"
+
 #include <stddef.h>
 
 typedef void   (*pfn_series_gen)(double x, double * restrict out, unsigned num_terms);
@@ -16,3 +18,4 @@ extern const size_t num_series;
 #define series_plural_end (series_plural + num_series)
 
 unsigned short str2idx_series(const char * str);
+void fill_terms(double x, const series *restrict ser, double4 *restrict terms, unsigned num_terms);
