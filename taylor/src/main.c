@@ -1,5 +1,6 @@
 #include "argv0.h"
 #include "print_usage.h"
+#include "output.h"
 #include "series.h"
 #include "sumfn.h"
 #include "util.h"
@@ -11,18 +12,16 @@
 #include <string.h>
 
 static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns num_terms) {
-    tryprintf("%s" CS PRECDBL CS "%u", ser->nam, x, num_terms);
-
     cdbl ref = ser->ref(x);
     const sum_alg *exc al = sum_algs;
     cdbl first_sum     = calc_sum(terms, num_terms, al);
     cdbl first_abs_err = first_sum - ref;
-    tryprintf(CS PRECDBL CS PRECDBL CS PRECDBL, ref, first_sum, first_abs_err);
+    try(print_per_row(ser, x, num_terms, ref, first_sum, first_abs_err));
 
     for (al++; al < sum_algs_end; al++) {
         cdbl sum     = calc_sum(terms, num_terms, al);
         cdbl rel_err = fabs((sum - ref) / first_abs_err);
-        tryprintf(CS PRECDBL CS PRECDBL, sum, rel_err);
+        try(print_per_sumfn(sum, rel_err));
     }
 
     try(putchar(*RS));
@@ -30,6 +29,8 @@ static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns n
 }
 
 static int main_inner(cdbl xstart, cdbl xend, cdbl xstep, const series *exc ser, cuns num_terms) {
+    try(print_header());
+
     cuns num_terms_align = align_to_lane(num_terms);
 
     double4 *exc terms = NULL;

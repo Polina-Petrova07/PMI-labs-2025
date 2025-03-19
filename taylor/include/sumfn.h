@@ -10,8 +10,9 @@ inline static double sum4_bwd (double4 v) { return  v.v[3] + v.v[2]  +  v.v[1] +
 inline static double sum4_fwd (double4 v) { return  v.v[0] + v.v[1]  +  v.v[2] + v.v[3] ; }
 
 typedef struct {
-    pfn_sum_arr  pfn;
-    const char * nam;
+    pfn_sum_arr  pfn ;
+    const char * nam ;
+    const char * desc;
 } sum_alg;
 
 extern const sum_alg sum_algs[];

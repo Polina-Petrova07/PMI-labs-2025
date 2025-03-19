@@ -17,8 +17,8 @@
 #define NUM_SUM_ALG 2
 const size_t num_sum_algs = NUM_SUM_ALG;
 const sum_alg sum_algs[NUM_SUM_ALG] = {
-    { sum_arr_bwd, "bwd" },
-    { sum_arr_fwd, "fwd" },
+    { sum_arr_bwd, "bwd", "Backward" },
+    { sum_arr_fwd, "fwd", "Forward"  },
 };
 
 unsigned short str2idx_sum_alg(const char * str) {
