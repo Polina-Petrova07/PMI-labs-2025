@@ -5,13 +5,13 @@
 #include <stdio.h>
 
 int print_header(void) {
-    try(fputs("Series name"CS"x"CS"Number of terms"CS"libm value"CS, stdout));
+    try(fputs("Series name,x,Number of terms,libm value,", stdout));
     const char * algdesc = sum_algs[0].desc;
-    try(printf("%s sum"CS"%s abs. error", algdesc, algdesc));
+    try(printf("%s sum,%s abs. error", algdesc, algdesc));
     for (const sum_alg *restrict al = sum_algs; al < sum_algs_end; al++) {
-        try(printf(CS"%s sum"CS"%s error rel. to first", al->desc, al->desc));
+        try(printf(",%s sum,%s error rel. to first", al->desc, al->desc));
     }
-    try(putchar(*RS));
+    try(putchar('\n'));
     return 0;
 }
 int print_per_row(

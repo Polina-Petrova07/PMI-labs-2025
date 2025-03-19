@@ -29,8 +29,6 @@ static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns n
 }
 
 static int main_inner(cdbl xstart, cdbl xend, cdbl xstep, const series *exc ser, cuns num_terms) {
-    try(print_header());
-
     cuns num_terms_align = align_to_lane(num_terms);
 
     double4 *exc terms = NULL;

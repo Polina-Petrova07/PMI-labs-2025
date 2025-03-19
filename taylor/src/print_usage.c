@@ -1,6 +1,7 @@
 #include "print_usage.h"
 
 #include "argv0.h"
+#include "output.h"
 #include "series.h"
 
 #define try(expr) if ((expr) < 0) return -1;
@@ -12,5 +13,7 @@ int print_usage(FILE * file) {
     tryputs("\nsupported series names:\n");
     for (const series * restrict ser = series_plural; ser < series_plural_end; ser++)
         tryprintf("%8s - %s\n", ser->nam, ser->desc);
+    tryputs("\ntable header:\n");
+    print_header();
     return 0;
 }
