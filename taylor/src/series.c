@@ -21,7 +21,7 @@ static void ser_sin(double x, double * restrict out, unsigned num_terms) {
 
 static void ser_cos(double x, double * restrict out, unsigned num_terms) {
     if (!num_terms) return;
-    double term = x;
+    double term = 1;
     *out++ = term;
     num_terms--;
     double xsq = x * x;
