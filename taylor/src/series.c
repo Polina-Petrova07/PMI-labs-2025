@@ -42,8 +42,11 @@ static void ser_exp(double x, double * restrict out, unsigned num_terms) {
 }
 
 static void ser_ln1p(double x, double * restrict out, unsigned num_terms) {
-    double term = -1;
-    for (unsigned i = 1; num_terms; num_terms--) *out++ = (term *= -x) / i;
+    if (!num_terms) return;
+    double term = x;
+    *out++ = term;
+    num_terms--;
+    for (unsigned i = 2; num_terms; num_terms--) *out++ = ((term *= -x) / i++);
 }
 
 static double ln1p(double x) { return log(1 + x); }
