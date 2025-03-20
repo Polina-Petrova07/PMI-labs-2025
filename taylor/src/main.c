@@ -6,22 +6,17 @@
 #include "util.h"
 
 #include <errno.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns num_terms) {
     cdbl ref = ser->ref(x);
-    const sum_alg *exc al = sum_algs;
-    cdbl first_sum     = calc_sum(terms, num_terms, al);
-    cdbl first_abs_err = first_sum - ref;
-    try(print_per_row(ser, x, num_terms, ref, first_sum, first_abs_err));
+    try(print_per_row(ser, x, num_terms, ref));
 
-    for (al++; al < sum_algs_end; al++) {
-        cdbl sum     = calc_sum(terms, num_terms, al);
-        cdbl rel_err = fabs((sum - ref) / first_abs_err);
-        try(print_per_sumfn(sum, rel_err));
+    for (const sum_alg *exc al = sum_algs; al < sum_algs_end; al++) {
+        cdbl sum = calc_sum(terms, num_terms, al);
+        try(print_per_sumfn(sum));
     }
 
     try(putchar(*RS));

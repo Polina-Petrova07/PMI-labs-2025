@@ -7,8 +7,6 @@ int print_per_row(
     const series *restrict ser          ,
     double                 x            ,
     unsigned               num_terms    ,
-    double                 ref          ,
-    double                 first_sum    ,
-    double                 first_abs_err
+    double                 ref
 );
-int print_per_sumfn(double sum, double rel_err);
+int print_per_sumfn(double sum);
