@@ -15,6 +15,7 @@ typedef unsigned long  lguns;
 #define exc restrict
 #define try(expr) if ((expr) < 0) return -1
 #define tryprintf(...) try(printf(__VA_ARGS__))
+#define tryputs(str)   try(fputs(str, file))
 
 #define CS "\037"
 #define RS "\036"

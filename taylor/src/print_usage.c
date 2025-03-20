@@ -3,10 +3,7 @@
 #include "argv0.h"
 #include "output.h"
 #include "series.h"
-
-#define try(expr) if ((expr) < 0) return -1;
-#define tryprintf(...) try(fprintf(file, __VA_ARGS__))
-#define tryputs(str) try(fputs(str, file))
+#include "util.h"
 
 int print_usage(FILE * file) {
     tryprintf("usage: %s xstart xend xstep series num_terms\n", prognam);
