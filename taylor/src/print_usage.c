@@ -6,12 +6,12 @@
 #include "util.h"
 
 int print_usage(FILE * file) {
-    tryprintf("usage: %s xstart xend xstep series num_terms\n", prognam);
-    tryputs("\nTo convert to CSV, pipe to:\n  tr '\\036\\037' '\\n,'\n");
-    tryputs("\nsupported series names:\n");
+    try(fprintf(file, "usage: %s xstart xend xstep series num_terms\n", prognam));
+    try(fputs("\nTo convert to CSV, pipe to:\n  tr '\\036\\037' '\\n,'\n", file));
+    try(fputs("\nsupported series names:\n", file));
     for (const series * restrict ser = series_plural; ser < series_plural_end; ser++)
-        tryprintf("%8s - %s\n", ser->nam, ser->desc);
-    tryputs("\ntable header [to standard output]\n");
+        try(fprintf(file, "%8s - %s\n", ser->nam, ser->desc));
+    try(fputs("\ntable header [to standard output]\n", file));
     print_header();
     return 0;
 }
