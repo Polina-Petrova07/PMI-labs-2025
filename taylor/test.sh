@@ -5,7 +5,7 @@ function run {
 
 trig_start=-6.28
 trig_end=6.28
-trig_step=0.2
+trig_step=0.1
 
 exp_start=-2
 exp_end=2.5
