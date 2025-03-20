@@ -49,15 +49,13 @@ static void ser_ln1p(double x, double * restrict out, unsigned num_terms) {
     for (unsigned i = 2; num_terms; num_terms--) *out++ = ((term *= -x) / i++);
 }
 
-static double ln1p(double x) { return log(1 + x); }
-
 #define NUM_SERIES 4
 const size_t num_series = NUM_SERIES;
 const series series_plural[NUM_SERIES] = {
-    { ser_sin , sin , "sin" , "sin(x)"  },
-    { ser_cos , cos , "cos" , "cos(x)"  },
-    { ser_exp , exp , "exp" , "exp(x)"  },
-    { ser_ln1p, ln1p, "ln1p", "ln(1+x)" },
+    { ser_sin , sin  , "sin" , "sin(x)"  },
+    { ser_cos , cos  , "cos" , "cos(x)"  },
+    { ser_exp , exp  , "exp" , "exp(x)"  },
+    { ser_ln1p, log1p, "ln1p", "ln(1+x)" },
 };
 
 unsigned short str2idx_series(const char * str) {
