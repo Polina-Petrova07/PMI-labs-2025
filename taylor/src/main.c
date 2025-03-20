@@ -12,7 +12,7 @@
 
 static int for_x(cdbl x, const series *exc ser, const double4 *exc terms, cuns num_terms) {
     cdbl ref = ser->ref(x);
-    try(print_per_row(x, num_terms, ref));
+    try(print_per_row(x, ref));
 
     for (const sum_alg *exc al = sum_algs; al < sum_algs_end; al++) {
         cdbl sum = calc_sum(terms, num_terms, al);
