@@ -1,0 +1,11 @@
+-Iinclude
+-g
+-D_FORTIFY_SOURCE=3
+-std=gnu11
+-Wpedantic
+-Wno-extra-semi
+-Wno-gnu
+-fwrapv
+-fno-plt
+-O3
+-lm
