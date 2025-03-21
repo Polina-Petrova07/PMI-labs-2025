@@ -1,5 +1,0 @@
-﻿  main.c
-  functions.c
-C:\Users\Степан\source\repos\final\final\main.c(8,5): warning C4013: runProgram: нет определения; предполагается "extern" с возвратом типа "int"
-  Создание кода...
-  final.vcxproj -> C:\Users\Степан\source\repos\final\x64\Debug\final.exe
