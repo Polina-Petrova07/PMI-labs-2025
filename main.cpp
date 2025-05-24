@@ -13,9 +13,9 @@ int main() {
     std::cin >> b;
 
     SLAY<double> solver(A);
-    Vector<double> solution = solver.solve(b);
+    Vector<double> solution_1 = solver.solve(b);
 
-    std::cout  << "x: "; solution.print();
+    std::cout  << "x: "; solution_1.print();
 
     return 0;
 }

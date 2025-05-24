@@ -31,7 +31,7 @@ public:
 
     int getSize() const {return this->size;}
 
-    Vector<T> operator+(Vector &b)  {
+    Vector<T> operator+(Vector &b) const {
         if (this->size != b.size) {}
         Vector result=*this;
         for (int i = 0; i < size; i++) {
@@ -40,7 +40,7 @@ public:
         return result;
     }
 
-    Vector<T> operator-( Vector &b) {
+    Vector<T> operator-( Vector &b) const{
         if (this->size != b.size) {}
         Vector result=*this;
         for (int i = 0; i < size; i++) {
@@ -49,7 +49,7 @@ public:
         return result;
     }
 
-    Vector<T> operator*(const Vector &b) {
+    Vector<T> operator*(const Vector &b) const{
         if (this->size != b.size) {}
         Vector result=*this;
         for (int i = 0; i < size; i++) {
@@ -58,7 +58,7 @@ public:
         return result;
     }
 
-    Vector<T> operator* (int val){
+    Vector<T> operator* (int val) const{
         Vector<T> result=*this;
         for (int i = 0; i < size; i++) {
             result.arr[i] = arr[i] * val;

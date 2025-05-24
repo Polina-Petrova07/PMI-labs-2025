@@ -17,14 +17,14 @@ public:
         return (*this)[0].getSize();
     }
 
-    Vector<T> &operator[](int index) const {
+    Vector<T> &operator[](int index) const{
         if (index < 0 || index >= getRows()) {
             throw std::out_of_range("Вы вышли за рамки индексации");
         }
         return Vector<Vector<T> >::operator[](index);
     }
 
-    Matrix<T> &operator=(const Matrix<T>& other) {
+    Matrix<T> &operator=(const Matrix<T>& other){
         if (this != &other) {
             Vector<Vector<T> >::operator=(other);
         }

@@ -47,7 +47,7 @@ public:
 
             T div = (*this)[i][i];
             if (div == 0) {
-                throw std::runtime_error("Матрица не вырождена");
+                throw std::runtime_error("Матрица вырождена");
             }
 
             for (int j = i; j < M; j++) {
@@ -78,8 +78,7 @@ public:
         if (this->getRows() != b.getSize()) {
             throw std::invalid_argument("Не совместные размеры");
         }
-        Matrix<T> temp(*this);
-        SLAY<T> temp_solver(temp);
+        SLAY<T> temp_solver(*this);
 
         return temp_solver.gauss(b);
     }
