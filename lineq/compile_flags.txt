@@ -1,0 +1,7 @@
+-Iinclude
+-std=c++17
+-Wextra
+-fno-plt
+-fwrapv
+-fno-strict-aliasing
+-g
