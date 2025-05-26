@@ -1,4 +1,5 @@
 #include "print_results.hxx"
+#include "fuzzy_eq.hxx"
 #include "solve.hxx"
 #include <iostream>
 #include <sstream>
@@ -14,7 +15,9 @@ static size_t pivot_row_of_var(solution_traces const& traces,size_t var) {
 }
 
 template<typename T, mat_maj maj>
-static string collect_indeps(solution_traces const& traces, mat<T, maj> m, size_t split) {
+static string collect_indeps( // NOLINT cog. comp.
+    solution_traces const& traces, mat<T, maj> m, size_t split
+) {
     stringstream s;
     for (size_t ifv = 0; ifv < traces.num_free_vars(); ifv++) {
         size_t fv = traces.free_vars()[ifv];
@@ -28,7 +31,11 @@ static string collect_indeps(solution_traces const& traces, mat<T, maj> m, size_
             if (v == fv) s << '1';
             else {
                 size_t row = pivot_row_of_var(traces, v);
-                s << ((row != SIZE_MAX) ? m[row][fv] : 0);
+                if (row == SIZE_MAX) s << '0';
+                else {
+                    auto val = m[row][fv];
+                    s << ((val != 0) ? -val : val); // avoid negative zero
+                }
             }
             spac = " ";
         }
