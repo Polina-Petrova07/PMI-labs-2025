@@ -62,9 +62,8 @@ solution_traces gauss_jordan(mat<T, maj> m, size_t split, bool verbose) { // NOL
 
     solution_traces traces {m.n_rows(), m.n_cols()};
     bitset          pivots {m.n_cols()};
-    size_t end = min(m.n_rows(), split);
 
-    for (size_t col = 0; col < end; col++) {
+    for (size_t col = 0; col < split; col++) {
         size_t pivot_row = select_pivot(m.col(col), pivots);
         if (pivot_row == SIZE_MAX) {
             // No pivot found for this column – we have a free variable
@@ -87,9 +86,6 @@ solution_traces gauss_jordan(mat<T, maj> m, size_t split, bool verbose) { // NOL
             print_mat_with_split(cerr, m, split);
         }
     }
-
-    // If we don't have enough equations, all remaining variables are free
-    for (size_t c = m.n_rows(); c < split; c++) traces.free_vars()[traces._num_free_vars++] = c;
 
     for (size_t r = 0; r < m.n_rows(); r++) {
         size_t idx = m.row(r).first_nonzero_idx();
