@@ -77,7 +77,7 @@ struct vec {
     }
 
     [[nodiscard]] size_t first_nonzero_idx() const {
-        for (size_t i; i < _len; i++) if (!fuzzy_eq_zero((*this)[i])) return i;
+        for (size_t i = 0; i < _len; i++) if (!fuzzy_eq_zero((*this)[i])) return i;
         return SIZE_MAX;
     }
 
