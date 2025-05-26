@@ -57,7 +57,7 @@ static void elim(vec<f64, hs> dst, vec<f64, hs> src, size_t col)
 
 
 template<typename T, mat_maj maj>
-solution_traces gauss_jordan(mat<T, maj> m, size_t split, bool verbose) {
+solution_traces gauss_jordan(mat<T, maj> m, size_t split, bool verbose) { // NOLINT cog. comp.
     if (split > m.n_cols()) throw range_error("matrix split out of bounds");
 
     solution_traces traces {m.n_rows(), m.n_cols()};
@@ -97,11 +97,22 @@ solution_traces gauss_jordan(mat<T, maj> m, size_t split, bool verbose) {
         // some of the right-hand sides form unsatisfiable equations, and in those columsn to
         // the right of the split where the element at a zeroed row is non-zero, the system of
         // equations is unsatisfiable.
-        if (idx != SIZE_MAX && idx >= split) traces.zeroed_rows()[traces._num_0_rows++] = r;
+        if (verbose) cerr << "solver: row " << r+1;
+        if (idx != SIZE_MAX && idx >= split) {
+            if (verbose) cerr << " has unsatisfiable equations\n";
+            traces.zeroed_rows()[traces._num_0_rows++] = r;
+        } else if (verbose) cerr << " doesn't have unsatisfiable equations\n"; 
     };
 
-    if (verbose) cerr << "solver: finished with " << traces.num_free_vars() << " free variables and "
-         << traces.num_0_rows() << " rows with unsatisfiable equations\n";
+    if (verbose) {
+        cerr << "solver: finished with " << traces.num_free_vars() << " free variable";
+        if (traces.num_free_vars() != 1) cerr << 's';
+        cerr << " and " << traces.num_0_rows() << " row";
+        if (traces.num_0_rows() != 1) cerr << 's';
+        cerr << " with ";
+        if (m.n_cols() - split == 1) cerr << "an unsatisfiable equation\n";
+        else cerr << "unsatisfiable equations\n";
+    }
     return traces;
 }
 
