@@ -1,4 +1,5 @@
 #include "print_results.hxx"
+#include "solve.hxx"
 #include <iostream>
 #include <sstream>
 using namespace std;
@@ -19,7 +20,8 @@ static string collect_indeps(solution_traces const& traces, mat<T, maj> m, size_
         size_t fv = traces.free_vars()[ifv];
         s << " + t";
         if (traces.num_free_vars() > 1) s << ifv + 1;
-        s << " * [";
+        s << " * ";
+        if (split > 1) s << '[';
         const char* spac = "";
         for (size_t v = 0; v < split; v++) {
             s << spac;
@@ -30,9 +32,17 @@ static string collect_indeps(solution_traces const& traces, mat<T, maj> m, size_
             }
             spac = " ";
         }
-        s << ']';
+        if (split > 1) s << ']';
     }
     return s.str();
+}
+
+template<typename T, mat_maj maj>
+static bool is_unsatisfiable(solution_traces const& traces, mat<T, maj> m, size_t ei) {
+    // If the right-hand side of a zeroed row is non-zero, the equation is unsatisfiable.
+    for (size_t i = 0; i < traces.num_0_rows(); i++)
+        if (!fuzzy_eq_zero(m[traces.zeroed_rows()[i]][ei])) return true;
+    return false;
 }
 
 static void print_pivots(ostream& o, solution_traces const& traces) {
@@ -57,7 +67,21 @@ void print_results(ostream& o, solution_traces const& traces, mat<T, maj> m, siz
     for (size_t ei = split; ei < m.n_cols(); ei++) {
         size_t eqn = ei - split + 1;
         if (m.n_cols() - split > 1) o << "equation " << eqn << ": ";
-        o << '[';
+
+        if (is_unsatisfiable(traces, m, ei)) {
+            o << "no solutions\n";
+            continue;
+        }
+        
+        o << "x = ";
+
+        // FIXME this should be a check for whether the free variable vectors form a basis
+        if (split == 1 && traces.num_free_vars() == 1) {
+            o << "any number\n";
+            continue;
+        }
+        
+        if (split > 1) o << '[';
         const char* spac = "";
         for (size_t v = 0; v < split; v++) {
             o << spac;
@@ -66,7 +90,8 @@ void print_results(ostream& o, solution_traces const& traces, mat<T, maj> m, siz
             else print_div(o, m[row][ei], m[row][v]);
             spac = " ";
         }
-        o << ']' << indeps << '\n';
+        if (split > 1) o << ']';
+        o << indeps << '\n';
     }
 }
 
