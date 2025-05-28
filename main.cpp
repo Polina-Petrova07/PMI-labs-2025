@@ -1,74 +1,137 @@
 #include "pch.h"
 #include <iostream>
-#include <vector>
 #include <iomanip>
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <limits>
 
-
 template <typename T>
-class Vector : public std::vector<T> {
-public:
-	using std::vector<T>::vector;
+class Vector {
+private:
+	T* data;
+	size_t count;
 
-	friend std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
-		os << "[";
-		for (size_t i = 0; i < vec.size(); ++i) {
-			os << std::fixed << std::setprecision(4) << vec[i];
-			if (i < vec.size() - 1) {
-				os << ", ";
+public:
+	Vector() : data(nullptr), count(0) {}
+
+	explicit Vector(size_t size) : count(size) {
+		if (size == 0) {
+			data = nullptr;
+		}
+		else {
+			data = new T[size]();
+		}
+	}
+
+	Vector(const Vector& other) : count(other.count) {
+		data = new T[count];
+		for (size_t i = 0; i < count; ++i) {
+			data[i] = other.data[i];
+		}
+	}
+
+	Vector<T>& operator=(const Vector<T>& other) {
+		if (this != &other) {
+			delete[] data;
+			count = other.count;
+			data = new T[count];
+			for (size_t i = 0; i < count; ++i) {
+				data[i] = other.data[i];
 			}
 		}
-		os << "]";
-		return os;
+		return *this;
 	}
+
+	~Vector() {
+		delete[] data;
+	}
+
+	void swap(Vector<T>& other) noexcept {
+		std::swap(this->data, other.data);
+		std::swap(this->count, other.count);
+	}
+
+	T& operator[](size_t index) {
+		if (index >= count) throw std::out_of_range("Индекс вектора вне диапазона");
+		return data[index];
+	}
+
+	const T& operator[](size_t index) const {
+		if (index >= count) throw std::out_of_range("Индекс вектора вне диапазона");
+		return data[index];
+	}
+
+	size_t size() const {
+		return count;
+	}
+
+	template <typename U>
+	friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 };
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
+	os << "[";
+	for (size_t i = 0; i < vec.size(); ++i) {
+		os << std::fixed << std::setprecision(4) << vec[i];
+		if (i < vec.size() - 1) {
+			os << ", ";
+		}
+	}
+	os << "]";
+	return os;
+}
+
 
 template <typename T>
 class SquareMatrix {
 protected:
 	Vector<Vector<T>> matrix;
-	size_t size;
+	size_t mat_size;
 
 public:
-	SquareMatrix() : size(0) {}
+	SquareMatrix() : mat_size(0) {}
 
-	explicit SquareMatrix(size_t n) : size(n) {
-		matrix.resize(n, Vector<T>(n, 0));
+	explicit SquareMatrix(size_t n) : mat_size(n), matrix(n) {
+		for (size_t i = 0; i < n; ++i) {
+			matrix[i] = Vector<T>(n);
+		}
 	}
 
 	size_t getSize() const {
-		return size;
+		return mat_size;
+	}
+
+	void swapRows(size_t row1, size_t row2) {
+		if (row1 < mat_size && row2 < mat_size) {
+			matrix[row1].swap(matrix[row2]);
+		}
 	}
 
 	Vector<T>& operator[](size_t index) {
-		if (index >= size) throw std::out_of_range("Индекс строки матрицы вне диапазона");
 		return matrix[index];
 	}
 
 	const Vector<T>& operator[](size_t index) const {
-		if (index >= size) throw std::out_of_range("Индекс строки матрицы вне диапазона");
 		return matrix[index];
 	}
 
-	void swapRows(size_t row1, size_t row2) {
-		if (row1 < size && row2 < size) {
-			std::swap(matrix[row1], matrix[row2]);
-		}
-	}
-
-	friend std::ostream& operator<<(std::ostream& os, const SquareMatrix<T>& mat) {
-		for (size_t i = 0; i < mat.getSize(); ++i) {
-			for (size_t j = 0; j < mat.getSize(); ++j) {
-				os << std::setw(10) << std::fixed << std::setprecision(4) << mat[i][j];
-			}
-			os << std::endl;
-		}
-		return os;
-	}
+	template <typename U>
+	friend std::ostream& operator<<(std::ostream& os, const SquareMatrix<U>& mat);
 };
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const SquareMatrix<T>& mat) {
+	for (size_t i = 0; i < mat.getSize(); ++i) {
+		for (size_t j = 0; j < mat.getSize(); ++j) {
+			os << std::setw(12) << std::fixed << std::setprecision(4) << mat[i][j];
+		}
+		os << std::endl;
+	}
+	return os;
+}
+
 
 template <typename T>
 class SLAE : public SquareMatrix<T> {
@@ -76,13 +139,13 @@ public:
 	using SquareMatrix<T>::SquareMatrix;
 
 	Vector<T> gaussMethod(Vector<T>& b) {
-		if (this->size != b.size()) {
+		if (this->mat_size != b.size()) {
 			throw std::invalid_argument("Размер вектора правой части не совпадает с размером матрицы.");
 		}
 
-		SquareMatrix<T> temp_matrix = *this;
+		SLAE<T> temp_matrix(*this);
 		Vector<T> temp_b = b;
-		size_t n = this->size;
+		size_t n = this->mat_size;
 
 		for (size_t i = 0; i < n; ++i) {
 			size_t pivot_row = i;
@@ -92,11 +155,13 @@ public:
 				}
 			}
 
-			temp_matrix.swapRows(i, pivot_row);
-			std::swap(temp_b[i], temp_b[pivot_row]);
+			if (i != pivot_row) {
+				temp_matrix.swapRows(i, pivot_row);
+				std::swap(temp_b[i], temp_b[pivot_row]);
+			}
 
 			if (std::abs(temp_matrix[i][i]) < 1e-12) {
-				throw std::runtime_error("Матрица вырождена или близка к вырожденной. Решений нет или их бесконечно много.");
+				throw std::runtime_error("Матрица вырождена или близка к вырожденной.");
 			}
 
 			for (size_t k = i + 1; k < n; ++k) {
@@ -133,10 +198,11 @@ int main() {
 	setlocale(LC_ALL, "Russian");
 
 	int n;
+
 	std::cout << "1. Введите размер квадратной матрицы: ";
 	std::cin >> n;
 	while (std::cin.fail() || n <= 0) {
-		std::cout << "  Ошибка: Введите положительное целое число. Попробуйте еще раз: ";
+		std::cout << "   Ошибка: Введите положительное целое число. Попробуйте еще раз: ";
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		std::cin >> n;
@@ -171,5 +237,6 @@ int main() {
 	catch (const std::exception& e) {
 		std::cerr << "\nОшибка при решении: " << e.what() << std::endl;
 	}
+
 	return 0;
 }
